@@ -116,7 +116,7 @@
 
 <img 
 	id='picture'
-	src={"Home\\" + big.md5 + ".jpg"}
+	src={"Home/" + big.md5 + ".jpg"}
 	alt=""
 	on:wheel={wheel}
 	on:mousedown={mousedown}

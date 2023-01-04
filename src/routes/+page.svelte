@@ -10,7 +10,7 @@
 	import BigPicture from "../BigPicture.svelte"
 	import Infinite from "../Infinite.svelte"
 	import fileIndex from '../json/file_index.json'
-	import data from '../json/bilder.json'
+	// import data from '../json/bilder.json'
 	import { browser } from '$app/environment'
 
 	export const prerender = true
@@ -31,12 +31,11 @@
 	// 13 md5 (t ex 0123456789abcdef0123456789abcdef)
 
 	let Home
-	// async function getJSON() {
-	// 	// let response = await fetch("./json/bilder.json")
-	// 	let response = await fetch("/json/bilder.json")
-	// 	return await response.json()
-	// }
-	// const promise = getJSON()
+	async function getJSON() {
+		let response = await fetch("/json/bilder.json")
+		return await response.json()
+	}
+	const promise = getJSON()
 
 	const range = _.range
 
@@ -391,16 +390,16 @@
 		return ""
 	}
 
-	setHome(data)
+	// setHome(data)
 
 </script>
 
 <svelte:window bind:scrollY={y}/>
 
-<!-- {#await promise } -->
-	<!-- <p>Loading...</p> -->
-<!-- {:then data} -->
-	<!-- {setHome(data)} -->
+{#await promise }
+	<p>Loading...</p>
+{:then data}
+	{setHome(data)}
 	{#if big.md5 == ""}
 		<Search bind:sokruta {text0} {text1} {stack} {WIDTH} {GAP} {spreadWidth} {path} {_} {is_jpg} />
 		<Download bind:selected {images} {WIDTH} {spreadWidth} {MAX_DOWNLOAD} {stack} {pop}/>
@@ -410,4 +409,4 @@
 	{:else}
 		<BigPicture {big} {prettyFilename} />
 	{/if}
-<!-- {/await} -->
+{/await}
