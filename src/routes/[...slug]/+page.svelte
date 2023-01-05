@@ -1,19 +1,49 @@
 <script>
 	import _ from "lodash"
-	// import { site,innerwidth } from '$lib/stores.js'
-	// import {timeSince} from '$lib/utils.js'
+	import { bilder, path } from '$lib/stores.js'
+	import { log } from '$lib/utils.js'
+
   export let data
 
-	console.log('slug',data)
+	function search(curr) { // returnerar lista av [sw,sh,bs,bw,bh,md5]
+		const res = []
+		function recurse(c,ancestors=[]) {
+			log('recurse',ancestors)
+			for (const key of _.keys(c)) {
+				if (key.endsWith('.jpg')) {
+					// const list1 = c[key].concat(ancestors)
+					res.push(c[key].concat(ancestors.concat([key])))
+				} else {
+					recurse(c[key],ancestors.concat([key]))
+				}
+			}
+		}
+		recurse(curr)
+		return res
+	}
 
-	// $: [directory,filename] = data.slug.split('/') //.replaceAll('_',' ').replace('.md','').split('/')
-	// $: words = data.slug.includes('common') ? [] : $site.posts[data.slug][1].split(' ')
-	// $: published = data.slug.includes('common') ? "" : `Publicerad fÃ¶r ${timeSince($site.posts[data.slug][0].date)} sedan i ${directory}`
+	console.log('bilder')
+	$: path.set(data.slug.split('/'))
+
+	// sök upp alla bilder via $bilder
+	$: log('path',$path)
+
+	$: curr = $bilder
+	
+	$: {for (const p of $path) {
+		curr = curr[p]
+		// log(_.keys(curr))
+	}
+}
+
+	$: images  = search(curr)
+	$: log(images)
+
 </script>
 
-{data.slug}
-
-<img src={'/Home/81e71fb5822ee9b2e1c2b19a6d5f7733.jpg'} alt=''/>
+{$path.join('/')}
+{images.length}
+<!-- <img src={'/Home/81e71fb5822ee9b2e1c2b19a6d5f7733.jpg'} alt=''/> -->
 
 <!-- <div style='width:{innerwidth}px'>
 
