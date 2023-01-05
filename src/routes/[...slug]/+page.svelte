@@ -5,14 +5,13 @@
 
   export let data
 
-	function search(curr) { // returnerar lista av [sw,sh,bs,bw,bh,md5]
+	function search(curr) { // returnerar lista av [sw,sh,bs,bw,bh,md5,ancestors]
 		const res = []
-		function recurse(c,ancestors=[]) {
-			log('recurse',ancestors)
+		function recurse(c,ancestors=$path) {
+			// log('recurse',ancestors)
 			for (const key of _.keys(c)) {
 				if (key.endsWith('.jpg')) {
-					// const list1 = c[key].concat(ancestors)
-					res.push(c[key].concat(ancestors.concat([key])))
+					res.push(c[key].concat([ancestors.concat([key])]))
 				} else {
 					recurse(c[key],ancestors.concat([key]))
 				}
