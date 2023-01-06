@@ -25,7 +25,7 @@
 	$: path.set(data.slug.split('/'))
 
 	// sök upp alla bilder via $bilder
-	$: log('path',$path)
+	// $: log('path',$path)
 
 	$: curr = $bilder
 	
@@ -36,25 +36,12 @@
 }
 
 	$: images  = search(curr)
-	$: log(images)
+	// $: log(images)
 
 </script>
 
-{$path.join('/')}
-{images.length}
-<!-- <img src={'/Home/81e71fb5822ee9b2e1c2b19a6d5f7733.jpg'} alt=''/> -->
-
-<!-- <div style='width:{innerwidth}px'>
-
-	<h1>{filename}</h1>
-	<i>{published}</i>
-
-	<svelte:component this={data.content} />
-
-	<h6>
-	{#each words as word}
-		<a href={`/query/${word}`}>{word}</a> â€¢&nbsp;
-	{/each}
-	</h6>
-
-</div> -->
+Antal {images.length} <br>
+{$path.join('/')} <br>
+{#each images as image}
+	{image[6].join(' * ')}<br>
+{/each}

@@ -1,7 +1,8 @@
 <script>
 	import _ from "lodash"
-	export let stack
+	// export let stack
 	export let WIDTH
+	import {stack,path} from '$lib/stores.js'
 
 	function clean(stack){
 		const n = stack.length
@@ -25,7 +26,7 @@
 <div style="width:{WIDTH-1}px">
 	<div>
 		<span>
-			<button style="width:{WIDTH-1}px">{clean(stack)}</button>
+			<button style="width:{WIDTH-1}px">{clean($stack)}</button>
 		</span>
 	</div>
 </div>

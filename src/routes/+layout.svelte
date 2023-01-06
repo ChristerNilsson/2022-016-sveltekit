@@ -13,7 +13,7 @@
 	import {log} from '$lib/utils.js'
 	
 	import { browser } from '$app/environment'
-	import { bilder } from '$lib/stores.js'
+	import { bilder, stack, path } from '$lib/stores.js'
 
 	$: log('+layout',_.keys($bilder))
 
@@ -81,8 +81,8 @@
 	$: WIDTH = calcWidth(browser ? innerWidth : 1920)
 	$: COLS = Math.floor((browser ? innerWidth : 1920)-SCROLLBAR-GAP)/WIDTH
 
-	let path  = [Home] // used for navigation
-	let stack = ["Home"] //getVisibleKeys
+	path.set([Home]) // used for navigation
+	stack.set(["Home"]) //getVisibleKeys
 	
 	let res=[]
 	let stat={}
@@ -98,7 +98,7 @@
 	let visibleKeys = {}
 
 	// innehåller de kataloger söksträngen finns i. T ex {"2022":7,"2021":3} Innehåller antal bilder
-	$: visibleKeys = getVisibleKeys(res, path.length)
+	$: visibleKeys = getVisibleKeys(res, $path.length)
 
 	const is_jpg = (file) => file.endsWith('.jpg') || file.endsWith('.JPG')
 	const round = (x,n) => Math.round(x*Math.pow(10,n))/Math.pow(10,n)
@@ -112,17 +112,16 @@
 	function consumeFolder(folder) {
 		console.log(folder)
 		sokruta = ""
-		stack = folder.split("\\")
-		path.length = 0 // clear
-		path.push(Home)
+		stack.set(folder.split("\\"))
+		path.set([Home])
 		let pointer = Home
 		for (const key of stack.slice(1)) {
 			console.log(key)
 			pointer = pointer[key]
-			path.push(pointer)
+			$path.push(pointer)
 		}
-		path = path
-		stack = stack 
+		//path = path
+		//stack = stack 
 	}
 
 	consumeParameters()
@@ -138,7 +137,7 @@
 		}
 	}
 
-	$: [text0,text1,images] = search(_.last(path), sokruta, stack.join('\\'), Home)
+	$: [text0,text1,images] = search(_.last($path), sokruta, $stack.join('\\'), Home)
 	// $: [text0,text1,images] = search($bilder, sokruta, stack.join('\\'), Home)
 
 	$: { 
@@ -235,18 +234,18 @@
 			// // visaBig(t5[2],t5[3],t5[4],stack.concat(key).join("\\"))
 			// visaBig(t5[2],t5[3],t5[4],t5[5])
 		// } else {
-			path.push(_.last(path)[key])
-			stack.push(key)
-			path = path
-			stack = stack
+			$path.push(_.last($path)[key])
+			$stack.push(key)
+			// path = path
+			// stack = stack
 		}
 	}
 
 	function pop() {
-		path.pop()
-		stack.pop()
-		path = path
-		stack = stack
+		$path.pop()
+		$stack.pop()
+		// path = path
+		// stack = stack
 	}
 
 	// Gå igenom listan, plocka ut de knappar som ska synas.
@@ -264,7 +263,7 @@
 	}
 
 	function search(node,words,path) {
-		log('search',{node})
+		// log('search',{node})
 		ymax = 0 // Viktigt! Annars syns inte nya bilder.
 		cards = []
 		count = 0
@@ -281,7 +280,7 @@
 		const start = new Date()
 
 		const levels = 99
-		recursiveSearch(node, words, path, levels)
+		//recursiveSearch(node, words, path, levels)
 		res.sort((a,b) => multiSort(a,b,[1,2,-3,13])) // OBS: index++  [-letters.length, letters, -path, key] [-3, 'ABC', 'Home/2022/2022-09-17...', 'Pelle...jpg']
 
 		const keys = Object.keys(stat)
@@ -296,32 +295,32 @@
 	}
 
 	// rekursiv pga varierande djup i trädet
-	function recursiveSearch (node,words,path,levels) { // node är nuvarande katalog. words är de sökta orden
-		log('recursiveSearch',node)
-		tick()
-		if (levels==0) return
-		for (const key in node) {
-			const newPath = path + "\\" + key
-			if (is_jpg(key)) {
-				total += 1
-				let s = ''
-				const newpath = newPath.toLowerCase()
-				for (const i in range(words.length)) {
-					const word = words[i]
-					if (word.length == 0) continue
-					count += 1
-					if (newpath.slice(10).includes(word)) s += ALFABET[i]
-				}
-				if (s.length > 0 || words.length == 0) {
-					const [sw,sh,bs,bw,bh,md5] = node[key] // small/big width/height/size md5=32*hex
-					res.push([-s.length, s, path, sw, sh, 0, 0, 0, false, bs, bw, bh, key, md5])
-					stat[s] = (stat[s] || 0) + 1
-				}
-			} else {
-				recursiveSearch(node[key], words, newPath, levels - 1)
-			}
-		}
-	}
+	// function recursiveSearch (node,words,path,levels) { // node är nuvarande katalog. words är de sökta orden
+	// 	// log('recursiveSearch',node)
+	// 	tick()
+	// 	if (levels==0) return
+	// 	for (const key in node) {
+	// 		const newPath = path + "\\" + key
+	// 		if (is_jpg(key)) {
+	// 			total += 1
+	// 			let s = ''
+	// 			const newpath = newPath.toLowerCase()
+	// 			for (const i in range(words.length)) {
+	// 				const word = words[i]
+	// 				if (word.length == 0) continue
+	// 				count += 1
+	// 				if (newpath.slice(10).includes(word)) s += ALFABET[i]
+	// 			}
+	// 			if (s.length > 0 || words.length == 0) {
+	// 				const [sw,sh,bs,bw,bh,md5] = node[key] // small/big width/height/size md5=32*hex
+	// 				res.push([-s.length, s, path, sw, sh, 0, 0, 0, false, bs, bw, bh, key, md5])
+	// 				stat[s] = (stat[s] || 0) + 1
+	// 			}
+	// 		} else {
+	// 			recursiveSearch(node[key], words, newPath, levels - 1)
+	// 		}
+	// 	}
+	// }
 
 	// Räknar ut vilken swimlane som är lämpligast.
 	// Uppdaterar x och y för varje bild
@@ -329,8 +328,8 @@
 	function placera(images,visibleKeys) {
 		const rows = sokruta=="" ? 4 : 5
 		let antal = rows + 1 + _.size(visibleKeys)
-		if (stack.length==2) antal+=1
-		if (stack.length!=2 && buttons) antal+=1
+		if ($stack.length==2) antal+=1
+		if ($stack.length!=2 && buttons) antal+=1
 
 		offset = 34 * antal // 30 + 2 * margin=2
 
@@ -397,8 +396,8 @@
 	function setHome(data) {
 		log('setHome',_.size(data))
 		Home = data
-		path = [Home]
-		stack = ["Home"]
+		path.set([Home])
+		stack.set(["Home"])
 		return ""
 	}
 
@@ -411,8 +410,8 @@
 {#if big.md5 == ""}
 	<!-- <Search bind:sokruta {text0} {text1} {stack} {WIDTH} {GAP} {spreadWidth} {path} {_} {is_jpg} /> -->
 	<!-- <Download bind:selected {images} {WIDTH} {spreadWidth} {MAX_DOWNLOAD} {stack} {pop}/> -->
-	<NavigationHorisontal {stack} {WIDTH} />
-	<NavigationVertical bind:buttons {visibleKeys} {push} {is_jpg} {WIDTH} {spaceShip} {stack} />
+	<NavigationHorisontal {WIDTH} />
+	<NavigationVertical bind:buttons {visibleKeys} {push} {is_jpg} {WIDTH} {spaceShip}  />
 	<!-- <Infinite {WIDTH} bind:selected {cards} {round} {fileWrapper} {prettyFilename} /> -->
 {:else}
 	<!-- <BigPicture {big} {prettyFilename} /> -->

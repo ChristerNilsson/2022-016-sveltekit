@@ -5,13 +5,14 @@
 	export let is_jpg
 	export let WIDTH
 	export let spaceShip
-	export let stack
+	// export let stack
 	export let buttons
+	import {stack,path} from '$lib/stores.js'
 
 	buttons = false
 
 	function sortera(keys,i) {
-		const path = stack.join("\\")
+		const path = $stack.join("\\")
 		buttons = (n == 2 && path != "Home\\0000 Klubbar") 
 		sortIndex = buttons ? i : 0
 
